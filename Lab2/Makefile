@@ -1,7 +1,6 @@
 CC =gcc
 NO_ASS =-c
 CFLAGS =-Wall
-LINKS_DIR =-L${HOME}/gsl/lib
 LINKS =-lm -ldislin -lgsl -lgslcblas
 MAIN =main.c
 MAIN_OUT =main.o
@@ -13,7 +12,7 @@ all: compile tests clean
 compile:
 	$(info "COMPILING ...........")
 	$(CC) $(CFLAGS) ${MAIN} ${NO_ASS} -o $(MAIN_OUT)
-	$(CC) $(CFLAGS) $(MAIN_OUT) $(LINKS_DIR)  ${LINKS} -o $(EXEC)
+	$(CC) $(CFLAGS) $(MAIN_OUT) ${LINKS} -o $(EXEC)
 
 tests:	
 	$(info 'PROGRAM STARTING ...........')
