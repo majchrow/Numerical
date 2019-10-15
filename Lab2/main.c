@@ -28,7 +28,7 @@ int main ()
   for(upper_bound = 0; ABS(upper_bound - 9) > epsrel; upper_bound+=0.2){
   	gsl_integration_qags (&F, lower_bound, upper_bound, epsabs, epsrel, limit, workspace, &result, &error);  	
   	printf ("Upper bound=%.2f, result = %.18f\n", upper_bound, result);
-  }
+  }	
 
   gsl_integration_workspace_free(workspace);
   return 0;
