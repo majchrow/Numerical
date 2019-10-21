@@ -12,14 +12,15 @@
 #include <assert.h>
 #include <string.h>
 #include <stdbool.h>
+#include "dislin.h"
 
 // Constant definitions
 #define a 0                    // lower bound
 #define b 19                   // upper bound
-#define k 19                   // number of grid points
+#define k 10                   // number of grid points
 #define h 1                    // (b-a)/k
-#define u_a 0                  // u(a)
-#define u_b 0                  // u(b)
+#define u_a 2                  // u(a)
+#define u_b 2                  // u(b)
 #define derivative "empirical" // empirical or analytical calculation of peano derivative
 
 // Method definitions
@@ -35,6 +36,7 @@ double peano_first_derivative(int deg, double x, const char* mode);
 double peano_second_derivative(int deg, double x, const char* mode);
 double coeff(int deg, double x);
 double final_u(double x, const double *coeffs);
+void plot_result(const double *coeffs, int N);
 
 // Method implementations
 double p(const double x){
@@ -50,7 +52,7 @@ double f(const double x){
 }
 
 double peano_polynomial(const int deg, const double x){
-    assert(x >= a + h && x <= b - h);  // t_k    e [a + h, ... , b - h]
+    assert(x > a - h  && x < b + h);  // t_k    e [a, ... ,b], where a,b points will be only used for empirical calculations
     assert(deg >= 1 && deg <=k);       // deg e {1, 2, .. k}
 
     switch (deg) {
@@ -121,14 +123,14 @@ double *solve_linear_system(bool print_system){ // calculate alpha_i for i e {1,
     coeffs[0] = u_a;   // alpha(1)
     coeffs[1] = u_b;   // alpha(2)
 
-    double matrix[(k-2)*(k-2)];  // (k-2)x(k-2) matrix of coefficients
-    double values[(k-2)];        // (k-2        array of function values
+    double *matrix = calloc((k-2)*(k-2), sizeof(double));  // (k-2)x(k-2) matrix of coefficients
+    double *values = calloc(k-2, sizeof(double));        // (k-2        array of function values
 
     double x;
     for(int i = 1; i < k-1; ++i){
         x = a + i*h;
         for(int deg = 2; deg < k; ++deg){
-            matrix[(i-1)*(k-2) + deg] = coeff(deg, x);
+            matrix[(i-1)*(k-2) + (deg-2)] = coeff(deg, x);
         }
         values[(i-1)] = f(x) - u_a * coeff(1, x) - u_b * coeff(2, x);
     }
@@ -142,13 +144,15 @@ double *solve_linear_system(bool print_system){ // calculate alpha_i for i e {1,
         }
     }
 
-//        // https://www.gnu.org/software/gsl/doc/html/linalg.html
+// https://www.gnu.org/software/gsl/doc/html/linalg.html
+
+    free(matrix);
+    free(values);
     return coeffs;
 
 }
 
 double final_u(const double x, const double *coeffs){
-    assert((sizeof(coeffs)/sizeof(coeffs[0])) == k); // should be exactly k coefficients
     double sum = 0;
     for(int i = 0; i < k; ++i){
         sum = sum + coeffs[i]*peano_polynomial(i+1, x); // coeffs[i] stays for alpha(i+1)
@@ -156,11 +160,53 @@ double final_u(const double x, const double *coeffs){
     return sum;
 }
 
+void plot_result(const double *coeffs, const int N){ // N +1 - grid points for plot
+    float *arguments = calloc(N+1, sizeof(float));
+    float *values    = calloc(N+1, sizeof(float));
+    float step = (double)(b-a)/N;
+
+    for (int i = 0; i < N; ++i){
+        arguments[i] = a + i*step;
+        values[i] = final_u(arguments[i], coeffs);
+        printf("args[%f] = %f\n", arguments[i], values[i]);
+    }
+
+    metafl ("cons");
+    disini ();
+    pagera ();
+    complx ();
+    axspos (450, 1800);
+    axslen (2200, 1200);
+
+    name   ("OX", "x");
+    name   ("OY", "y");
+
+    labdig (1,  "xy");
+    ticks  (10, "x");
+    ticks  (2, "y");
+
+    titlin ("Plot", 1);
+
+    int ic =   intrgb (0.95,0.95,0.95);
+    axsbgd (ic);
+
+    graf   (a - step, b + step, a, (double)b/4, -u_a - step, u_b + step, -u_a, (double)u_b/4);
+    setrgb (0.7, 0.7, 0.7);
+    grid   (1, 1);
+
+    color  ("fore");
+    height (50);
+    title  ();
+    color  ("blue");
+    curve  (arguments, values, N+1);
+    disfin ();
+    free(arguments);
+    free(values);
+}
+
 int main() {
     double* coeffs = solve_linear_system(true);
-//    for(int point = a; point <= b; ++point){
-//        printf("u(%d) = %15.10f\n", point, final_u((double) point, coeffs));
-//    }
+    plot_result(coeffs, 299);
     free(coeffs);
     return 0;
 }
