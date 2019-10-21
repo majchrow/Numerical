@@ -1,5 +1,5 @@
 /* Metoda kolokacji dla układu
- * | u''(x) + p(x)*u'(x) + q(x)*u = f(final_u)
+ * | u''(x) + p(x)*u'(x) + q(x)*u(x) = f(x)
  * | u(a) = u_a
  * | u(b) = u_b
  * Dawid Majchrowski 22.10.2019
@@ -11,6 +11,7 @@
 #include <math.h>
 #include <assert.h>
 #include <string.h>
+#include <stdbool.h>
 
 // Constant definitions
 #define a 0                    // lower bound
@@ -32,7 +33,7 @@ double empirical_first_derivative(int deg, double x);
 double empirical_second_derivative(int deg, double x);
 double peano_first_derivative(int deg, double x, const char* mode);
 double peano_second_derivative(int deg, double x, const char* mode);
-double coeff(double x, int deg);
+double coeff(int deg, double x);
 double final_u(double x, const double *coeffs);
 
 // Method implementations
@@ -51,6 +52,7 @@ double f(const double x){
 double peano_polynomial(const int deg, const double x){
     assert(x >= a + h && x <= b - h);  // t_k    e [a + h, ... , b - h]
     assert(deg >= 1 && deg <=k);       // deg e {1, 2, .. k}
+
     switch (deg) {
         case 1:  return (b - x)/(b - a);
         case 2:  return (x - a)/(b - a);
@@ -92,8 +94,8 @@ double empirical_second_derivative(const int deg, const double x){
 
 double peano_first_derivative(const int deg, const double x, const char* mode){
     assert(!strcmp(mode, "analytical") || ! strcmp(mode, "empirical")); // mode e {"analytical", "empirical"}
-    assert(x >= a + h && x <= b - h);                                   // t_k    e [a + h, ... , b - h]
-    assert(deg >= 1 && deg <=k);                                        // deg e {1, 2, .. k}
+    assert(x >= a + h && x <= b - h);                                   // t_k  e [a + h, ... , b - h]
+    assert(deg >= 1 && deg <=k);                                        // deg  e {1, 2, .. k}
 
     double (*first_derivative)(const int, const double) = !strcmp(mode, "analytical") ? &analytical_first_derivative : &empirical_first_derivative;
     return first_derivative(deg, x);
@@ -101,39 +103,46 @@ double peano_first_derivative(const int deg, const double x, const char* mode){
 
 double peano_second_derivative(const int deg, const double x, const char* mode){
     assert(!strcmp(mode, "analytical") || ! strcmp(mode, "empirical")); // mode e {"analytical", "empirical"}
-    assert(x >= a + h && x <= b - h);                                   // t_k    e [a + h, ... , b - h]
-    assert(deg >= 1 && deg <=k);                                        // deg e {1, 2, .. k}
+    assert(x >= a + h && x <= b - h);                                   // t_k  e [a + h, ... , b - h]
+    assert(deg >= 1 && deg <=k);                                        // deg  e {1, 2, .. k}
 
     double (*second_derivative)(const int, const double) = !strcmp(mode, "analytical") ? &analytical_second_derivative : &empirical_second_derivative;
     return second_derivative(deg, x);
 }
 
-double coeff(const double x, const int deg){ // calculate one coeff in system of equations for given grid final_u
+double coeff(const int deg, const double x){ // calculate one coeff in system of equations for given grid final_u
     return        peano_second_derivative(deg, x, derivative) +
            p(x) * peano_first_derivative (deg, x, derivative) +
            q(x) * peano_polynomial(deg, x);
 }
 
-double *solve_linear_system(){ // calculate alpha_i for i e {1,...,k}
+double *solve_linear_system(bool print_system){ // calculate alpha_i for i e {1,...,k}
     double *coeffs = calloc(k, sizeof(double));
-    coeffs[0] = u_a; // alpha(1)
-    coeffs[k-1] = u_b; // alpha(k)
+    coeffs[0] = u_a;   // alpha(1)
+    coeffs[1] = u_b;   // alpha(2)
 
-    double a_data[(k-2)*(k-2)];
-    double b_data[(k-2)];
-    for(int i = 0; i<k; ++i){
-        // https://www.gnu.org/software/gsl/doc/html/linalg.html
-        // Examples
+    double matrix[(k-2)*(k-2)];  // (k-2)x(k-2) matrix of coefficients
+    double values[(k-2)];        // (k-2        array of function values
+
+    double x;
+    for(int i = 1; i < k-1; ++i){
+        x = a + i*h;
+        for(int deg = 2; deg < k; ++deg){
+            matrix[(i-1)*(k-2) + deg] = coeff(deg, x);
+        }
+        values[(i-1)] = f(x) - u_a * coeff(1, x) - u_b * coeff(2, x);
     }
 
+    if(print_system){ // if flag is set, print the system of equations to be solved
+        for(int i = 0; i < k-2; ++i){
+            for(int j = 0; j < k-2; ++j){
+                printf("%10.6f ", matrix[i*(k-2)+j]);
+            }
+            printf("= %10.6f\n", values[i]);
+        }
+    }
 
-//    for(int point = 2; point < k; ++point ){
-//        for (int degree = 2; degree < k; ++degree){
-//            printf("%10.6f ", coeff((double)point, degree));
-//        }
-//        printf("= %10.6f\n", f(point));
-//    }
-
+//        // https://www.gnu.org/software/gsl/doc/html/linalg.html
     return coeffs;
 
 }
@@ -148,10 +157,10 @@ double final_u(const double x, const double *coeffs){
 }
 
 int main() {
-    double* coeffs = solve_linear_system();
-    for(int point = a; point <= b; ++point){
-        printf("u(%d) = %15.10f\n", point, final_u((double) point, coeffs));
-    }
+    double* coeffs = solve_linear_system(true);
+//    for(int point = a; point <= b; ++point){
+//        printf("u(%d) = %15.10f\n", point, final_u((double) point, coeffs));
+//    }
     free(coeffs);
     return 0;
 }
