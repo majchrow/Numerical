@@ -112,7 +112,7 @@ double empirical_second_derivative(const int deg, const double x){
 
 double peano_first_derivative(const int deg, const double x, const char* mode){
     assert(!strcmp(mode, "analytical") || ! strcmp(mode, "empirical")); // mode e {"analytical", "empirical"}
-    assert(x >= a + h && x <= b - h);                                   // t_k  e [a + h, ... , b - h]
+    assert(x > a && x < b);                                             // t_k  e [a + h, ... , b - h]
     assert(deg >= 1 && deg <=k);                                        // deg  e {1, 2, .. k}
 
     double (*first_derivative)(const int, const double) = !strcmp(mode, "analytical") ? &analytical_first_derivative : &empirical_first_derivative;
@@ -121,7 +121,7 @@ double peano_first_derivative(const int deg, const double x, const char* mode){
 
 double peano_second_derivative(const int deg, const double x, const char* mode){
     assert(!strcmp(mode, "analytical") || !strcmp(mode, "empirical"));  // mode e {"analytical", "empirical"}
-    assert(x >= a + h && x <= b - h);                                   // t_k  e [a + h, ... , b - h]
+    assert(x > a && x < b);                                             // t_k  e [a + h, ... , b - h]
     assert(deg >= 1 && deg <=k);                                        // deg  e {1, 2, .. k}
 
     double (*second_derivative)(const int, const double) = !strcmp(mode, "analytical") ? &analytical_second_derivative : &empirical_second_derivative;
@@ -229,7 +229,7 @@ void plot_result(const double *coeffs, const int N){
     labdig (1,  "xy");
     ticks  (10, "x");
     ticks  (2, "y");
-    titlin ("Plot", 1);
+    titlin ("Collocation method solution", 1);
     axsbgd (ic);
     graf   (x_l, x_r, a, b/4., y_b, y_t, y_b, y_t/4.);
     setrgb (0.7, 0.7, 0.7);
