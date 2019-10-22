@@ -6,7 +6,6 @@ MAIN =main.c
 MAIN_OUT =main.o
 EXEC =main.out
 
-
 all: compile tests clean
 
 compile:
@@ -18,8 +17,8 @@ tests:
 	$(info 'PROGRAM STARTING ...........')
 	./$(EXEC)
 
-
 clean:
 	$(info 'PROGRAM DONE ...........')
 	$(info 'CLEANING ...........')
 	rm *.o*
+	rm *.met

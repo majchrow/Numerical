@@ -1,5 +1,5 @@
-Metoda kolokacji
+Collocation method for given system of equations:
 
-x''(t) + p(t)x'(t) + q(t)x = f(t)
-x(a) = u_a
-final_u(b) = u_b
+u''(x) + p(x)*u'(x) + q(x)*u(x) = f(x)
+u(a) = u_a
+u(b) = u_b
