@@ -24,14 +24,14 @@
 #include "dislin.h"
 
 // Constant definitions
-#define a -1                         // lower bound
-#define b  2                         // upper bound
-#define k  4                         // number of grid points
-#define h (double)(b-a)/(k-1)        // distance between grid points
-#define u_a  2                       // u(a)
-#define u_b  35                      // u(b)
-#define derivative "analytical"      // "empirical" or "analytical" calculation of Peano derivative
-#define n 30                         // plotting grid size
+#define a -1.                         // lower bound
+#define b  2.                         // upper bound
+#define k  4                          // number of grid points
+#define h (b-a)/(k-1)                 // distance between grid points
+#define u_a  2.                       // u(a)
+#define u_b  35.                      // u(b)
+#define derivative "analytical"       // "empirical" or "analytical" calculation of Peano derivative
+#define n 30                          // grid size for plotting
 
 // Macros
 #define MAX(A,B) (A) > (B) ? (A) : (B)
@@ -205,7 +205,7 @@ double final_u(const double x, const double *coeffs){
 void plot_result(const double *coeffs, const int N){
     float *arguments = calloc(N, sizeof(float));
     float *values    = calloc(N, sizeof(float));
-    float step = (double)(b-a)/(N-1);
+    float step = (b-a)/(N-1);
     int ic =   intrgb (0.95,0.95,0.95);
     double x_l = a - 5.*step;             // x_left
     double x_r = b + 5.*step;             // x_right
@@ -246,13 +246,12 @@ void plot_result(const double *coeffs, const int N){
 
 // Main program
 int main(int argc, char* argv[]) {
-    printf("Starting program with params"
+    printf("Program started with params"
            "\n[a,b] = [%f, %f]\n"
            "u(a) = %f\n"
            "u(b) = %f\n"
-           "grid_point = %d\n",
-            (double)a, (double)b, (double)u_a, (double)u_b, k);
-    double* coeffs = solve_linear_system(true, true); // if true will print (system of equations/solution)
+           "grid_point = %d\n", a, b, u_a, u_b, k);
+    double *coeffs = solve_linear_system(true, true); // if true will print (system of equations/solution)
     plot_result(coeffs, n+1);
     free(coeffs);
     return 0;
