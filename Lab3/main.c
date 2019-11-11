@@ -24,14 +24,14 @@
 #include "dislin.h"
 
 // Constant definitions
-#define a -1.                         // lower bound
-#define b  2.                         // upper bound
-#define k  4                          // number of grid points
-#define h (b-a)/(k-1)                 // distance between grid points
-#define u_a  2.                       // u(a)
-#define u_b  35.                      // u(b)
-#define derivative "analytical"       // "empirical" or "analytical" calculation of Peano derivative
-#define n 30                          // grid size for plotting
+#define a   -1.                     // lower bound
+#define b    2.                     // upper bound
+#define k    4                      // number of grid points
+#define h    1.                     // distance between grid points
+#define u_a  2.                     // u(a)
+#define u_b  35.                    // u(b)
+#define derivative "analytical"     // "empirical" or "analytical" calculation of Peano derivative
+#define n    30                     // grid size for plotting
 
 // Macros
 #define MAX(A,B) (A) > (B) ? (A) : (B)
