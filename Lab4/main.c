@@ -6,6 +6,7 @@
  * | u''(x) + p(x)*u'(x) + q(x)*u(x) = f(x)
  * | u(a) = u_a
  * | u(b) = u_b
+ * | Expected solution for given problem u(x) = (1-x)(x)
 */
 
 // Libraries
@@ -24,8 +25,8 @@
 // Constant definitions
 #define a    0.                       // lower bound
 #define b    1.                       // upper bound
-#define k    4                        // number of grid points - 2 Points: (0,1,...,k,k+1)
-#define h    0.2                      // distance between grid points | (b-a)/(k+1) <- need to calculate
+#define k    99                       // number of grid points - 2 Points: (0,1,...,k,k+1)
+#define h    0.01                     // distance between grid points | (b-a)/(k+1) <- need to calculate
 #define u_a  0.                       // u(a)
 #define u_b  0.                       // u(b)
 #define n    1000                     // grid size for plotting
@@ -71,8 +72,8 @@ double c_2(const int j, const int i){
 
 double cf_2(const int j, const int i){
     assert(abs(i-j) < 2);
-    if(j==i)    return -1/h;
-    return  2/h;
+    if(j==i)    return 2/h;
+    return  -1/h;
 }
 
 double c_3(const int j, const int m, const int i){
@@ -265,10 +266,6 @@ int main(int argc, char* argv[]) {
            "u(b) = %f\n"
            "grid_point = %d\n", a, b, u_a, u_b, k);
     double *coeffs = solve_linear_system(true, true); // if true will print (system of equations/solution)
-    coeffs[0] = 0.16;
-    coeffs[1] = 0.24;
-    coeffs[2] = 0.24;
-    coeffs[3] = 0.16;
     plot_result(coeffs, n+1);
     return 0;
 }
