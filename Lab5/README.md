@@ -1,5 +1,2 @@
-Galerkin method for given system of equations:
-
-u''(x) + p(x)*u'(x) + q(x)*u(x) = f(x)
-u(a) = u_a
-u(b) = u_b
+Degenerate kernel method for Fredholm integral equations
+L*u(x) - inf_{a}^{b}K(x,s)u(s)ds = g(x)
