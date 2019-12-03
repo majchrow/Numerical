@@ -2,7 +2,7 @@
  * @author Dawid Majchrowski
  * @date   3.12.2019
  *
- * degenerate kernel method for Fredholm integral equations
+ * Degenerate kernel method for Fredholm integral equations
  * | L*u(x) - inf_{a}^{b}K(x,s)u(s)ds = g(x)
  * | Expected solution for given problem
  * | a,b, L, N, kij - given arbitrary
@@ -252,7 +252,7 @@ void plot_result(const double *coeffs, const int k) {
     labdig(1, "xy");
     ticks(10, "x");
     ticks(2, "y");
-    titlin("?? method solution", 1);
+    titlin("Degenerate kernel method solution", 1);
     axsbgd(ic);
     graf(x_l, x_r, a, b / 4., y_b, y_t, y_b, y_t / 4.);
     setrgb(0.7, 0.7, 0.7);
